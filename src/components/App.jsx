@@ -4,6 +4,8 @@ import { ContactList } from "./ContactList/ContactList";
 import { Filter } from "./Filter/Filter";
 import { Container } from "./App.styled";
 export class App extends Component {
+  #LS_KEY = "phonebook-contacs";
+
   state = {
     contacts: [
       { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
@@ -14,6 +16,19 @@ export class App extends Component {
     filter:'',
   }
 
+  componentDidMount() {
+    const savedContacts = localStorage.getItem(this.#LS_KEY);
+    if (savedContacts) {
+      this.setState({ contacts: JSON.parse(savedContacts) })
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem(this.#LS_KEY, JSON.stringify(this.state.contacts))
+    }
+  }
+  
   addNewContact = (newContact) => {
     this.state.contacts.find(c=>c.name===newContact.name)
       ? alert(`${newContact.name} already exists in contacts list.`)
@@ -32,7 +47,7 @@ export class App extends Component {
     const { contacts, filter } = this.state;
     const normalizedFilter = filter.toLowerCase();
     const filteredContacts = contacts.filter(c => c.name.toLowerCase().includes(normalizedFilter));
-
+ 
     return (
       <Container>
         <h1>Phonebook</h1>
